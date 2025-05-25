@@ -1,9 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-
-const MotionButton = motion.button as any;
+import { useState, useEffect, useCallback } from 'react';
 import { WordPair, GameState, GameConfig } from '@/types/game';
 
 const initialConfig: GameConfig = {
@@ -34,6 +31,20 @@ export default function WordMatchGame() {
   const [selectedMeaning, setSelectedMeaning] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(initialConfig.timeLimit || 30);
 
+  const resetSelection = useCallback(() => {
+    setSelectedWord(null);
+    setSelectedMeaning(null);
+    setTimeLeft(initialConfig.timeLimit || 30);
+  }, []);
+
+  const handleTimeUp = useCallback(() => {
+    setGameState((prev: GameState) => ({
+      ...prev,
+      lives: prev.lives - 1,
+    }));
+    resetSelection();
+  }, [resetSelection]);
+
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setInterval(() => {
@@ -43,21 +54,7 @@ export default function WordMatchGame() {
     } else {
       handleTimeUp();
     }
-  }, [timeLeft]);
-
-  const handleTimeUp = () => {
-    setGameState((prev: GameState) => ({
-      ...prev,
-      lives: prev.lives - 1,
-    }));
-    resetSelection();
-  };
-
-  const resetSelection = () => {
-    setSelectedWord(null);
-    setSelectedMeaning(null);
-    setTimeLeft(initialConfig.timeLimit || 30);
-  };
+  }, [timeLeft, handleTimeUp]);
 
   const handleWordClick = (word: WordPair) => {
     if (selectedWord === word) {
@@ -102,11 +99,9 @@ export default function WordMatchGame() {
           <h2 className="text-2xl font-bold mb-4">Words</h2>
           <div className="space-y-4">
               {availableWords.map((word) => (
-                <MotionButton
+                <button
                   key={word.word}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-full p-4 rounded-lg text-left ${
+                  className={`w-full p-4 rounded-lg text-left transition-all duration-200 hover:scale-105 active:scale-95 ${
                     selectedWord === word
                       ? 'bg-purple-600 text-white'
                       : 'bg-white shadow-md hover:shadow-lg'
@@ -114,7 +109,7 @@ export default function WordMatchGame() {
                   onClick={() => handleWordClick(word)}
                 >
                   {word.word}
-                </MotionButton>
+                </button>
               ))}
           </div>
         </div>
@@ -123,11 +118,9 @@ export default function WordMatchGame() {
           <h2 className="text-2xl font-bold mb-4">Meanings</h2>
           <div className="space-y-4">
               {meanings.map((meaning) => (
-                <MotionButton
+                <button
                   key={meaning}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`w-full p-4 rounded-lg text-left ${
+                  className={`w-full p-4 rounded-lg text-left transition-all duration-200 hover:scale-105 active:scale-95 ${
                     selectedMeaning === meaning
                       ? 'bg-green-600 text-white'
                       : 'bg-white shadow-md hover:shadow-lg'
@@ -135,29 +128,25 @@ export default function WordMatchGame() {
                   onClick={() => handleMeaningClick(meaning)}
                 >
                   {meaning}
-                </MotionButton>
+                </button>
               ))}
           </div>
         </div>
       </div>
 
       {gameState.lives <= 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center"
-        >
-          <div className="bg-white p-8 rounded-xl text-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center animate-in fade-in duration-300">
+          <div className="bg-white p-8 rounded-xl text-center animate-in zoom-in duration-300">
             <h2 className="text-3xl font-bold mb-4">Game Over!</h2>
             <p className="text-xl mb-6">Your final score: {gameState.score}</p>
             <button
               onClick={() => window.location.reload()}
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
             >
               Play Again
             </button>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

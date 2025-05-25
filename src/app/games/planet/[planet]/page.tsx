@@ -154,6 +154,19 @@ export default function PlanetGame() {
     };
 
     setGameSession(updatedSession);
+
+    // If answer is correct, automatically progress to next question after a short delay
+    if (isCorrect) {
+      setTimeout(() => {
+        // Check if level is complete
+        const exercises = getExercisesForLevel(planetId, currentLevel!);
+        if (updatedSession.currentQuestion > exercises.length) {
+          completeLevel(updatedSession);
+        } else {
+          loadNextQuestion(updatedSession);
+        }
+      }, 2000); // 2 second delay to show the success feedback
+    }
   };
 
   const handleNextQuestion = () => {
@@ -521,10 +534,15 @@ export default function PlanetGame() {
               >
                 Check Answer
               </button>
+            ) : feedback.type === 'success' ? (
+              <div className="px-10 py-4 rounded-lg text-white font-bold text-lg bg-green-600 shadow-lg flex items-center gap-2">
+                <span>Moving to next question...</span>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              </div>
             ) : (
               <button
                 onClick={handleNextQuestion}
-                className="px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg bg-green-600 hover:bg-green-700 shadow-green-200"
+                className="px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg bg-orange-600 hover:bg-orange-700 shadow-orange-200"
               >
                 Next Question →
               </button>
