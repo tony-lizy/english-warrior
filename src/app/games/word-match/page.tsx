@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+
+const MotionButton = motion.button as any;
 import { WordPair, GameState, GameConfig } from '@/types/game';
 
 const initialConfig: GameConfig = {
@@ -99,42 +101,42 @@ export default function WordMatchGame() {
         <div>
           <h2 className="text-2xl font-bold mb-4">Words</h2>
           <div className="space-y-4">
-            {availableWords.map((word) => (
-              <motion.button
-                key={word.word}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`w-full p-4 rounded-lg text-left ${
-                  selectedWord === word
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white shadow-md hover:shadow-lg'
-                }`}
-                onClick={() => handleWordClick(word)}
-              >
-                {word.word}
-              </motion.button>
-            ))}
+              {availableWords.map((word) => (
+                <MotionButton
+                  key={word.word}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-full p-4 rounded-lg text-left ${
+                    selectedWord === word
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white shadow-md hover:shadow-lg'
+                  }`}
+                  onClick={() => handleWordClick(word)}
+                >
+                  {word.word}
+                </MotionButton>
+              ))}
           </div>
         </div>
 
         <div>
           <h2 className="text-2xl font-bold mb-4">Meanings</h2>
           <div className="space-y-4">
-            {meanings.map((meaning) => (
-              <motion.button
-                key={meaning}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`w-full p-4 rounded-lg text-left ${
-                  selectedMeaning === meaning
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white shadow-md hover:shadow-lg'
-                }`}
-                onClick={() => handleMeaningClick(meaning)}
-              >
-                {meaning}
-              </motion.button>
-            ))}
+              {meanings.map((meaning) => (
+                <MotionButton
+                  key={meaning}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`w-full p-4 rounded-lg text-left ${
+                    selectedMeaning === meaning
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white shadow-md hover:shadow-lg'
+                  }`}
+                  onClick={() => handleMeaningClick(meaning)}
+                >
+                  {meaning}
+                </MotionButton>
+              ))}
           </div>
         </div>
       </div>
