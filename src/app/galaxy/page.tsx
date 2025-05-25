@@ -13,9 +13,9 @@ export default function GalaxyNavigation() {
     ageGroup: '8-9',
     totalPoints: 250,
     streak: 5,
-    unlockedPlanets: ['verb-volcano', 'punctuation-port', 'grammar-galaxy', 'vocabulary-village', 'sentence-city'],
+    unlockedPlanets: ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
     planetProgress: {
-      'verb-volcano': {
+      'mercury': {
         unlockedLevels: [1, 2, 3],
         levelProgress: {
           1: { completed: 50, total: 50, score: 85, stars: 2 },
@@ -25,7 +25,7 @@ export default function GalaxyNavigation() {
         totalCompleted: 80,
         totalQuestions: 500
       },
-      'punctuation-port': {
+      'venus': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 20, total: 50, score: 0, stars: 0 }
@@ -33,7 +33,7 @@ export default function GalaxyNavigation() {
         totalCompleted: 20,
         totalQuestions: 500
       },
-      'grammar-galaxy': {
+      'earth': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -41,7 +41,7 @@ export default function GalaxyNavigation() {
         totalCompleted: 0,
         totalQuestions: 500
       },
-      'vocabulary-village': {
+      'mars': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -49,7 +49,39 @@ export default function GalaxyNavigation() {
         totalCompleted: 0,
         totalQuestions: 500
       },
-      'sentence-city': {
+      'jupiter': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'saturn': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'uranus': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'neptune': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'pluto': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -104,7 +136,7 @@ export default function GalaxyNavigation() {
                 <div className="text-sm opacity-80">Current Tier</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{progress.unlockedPlanets.length}/5</div>
+                <div className="text-2xl font-bold">{progress.unlockedPlanets.length}/9</div>
                 <div className="text-sm opacity-80">Planets Unlocked</div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 export type AgeGroup = '8-9' | '9-10' | '10+';
 
-export type Planet = 'verb-volcano' | 'punctuation-port' | 'grammar-galaxy' | 'vocabulary-village' | 'sentence-city';
+export type Planet = 'mercury' | 'venus' | 'earth' | 'mars' | 'jupiter' | 'saturn' | 'uranus' | 'neptune' | 'pluto';
 
 export type ExerciseType = 'multiple-choice' | 'fill-in-blank' | 'correction' | 'matching' | 'sequencing';
 

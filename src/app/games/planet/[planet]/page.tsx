@@ -24,9 +24,9 @@ export default function PlanetGame() {
     ageGroup: '8-9',
     totalPoints: 0,
     streak: 0,
-    unlockedPlanets: ['verb-volcano', 'punctuation-port', 'grammar-galaxy', 'vocabulary-village', 'sentence-city'],
+    unlockedPlanets: ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
     planetProgress: {
-      'verb-volcano': {
+      'mercury': {
         unlockedLevels: [1, 2, 3],
         levelProgress: {
           1: { completed: 50, total: 50, score: 85, stars: 2 },
@@ -36,7 +36,7 @@ export default function PlanetGame() {
         totalCompleted: 80,
         totalQuestions: 500
       },
-      'punctuation-port': {
+      'venus': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 20, total: 50, score: 0, stars: 0 }
@@ -44,7 +44,7 @@ export default function PlanetGame() {
         totalCompleted: 20,
         totalQuestions: 500
       },
-      'grammar-galaxy': {
+      'earth': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -52,7 +52,7 @@ export default function PlanetGame() {
         totalCompleted: 0,
         totalQuestions: 500
       },
-      'vocabulary-village': {
+      'mars': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -60,7 +60,39 @@ export default function PlanetGame() {
         totalCompleted: 0,
         totalQuestions: 500
       },
-      'sentence-city': {
+      'jupiter': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'saturn': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'uranus': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'neptune': {
+        unlockedLevels: [1],
+        levelProgress: {
+          1: { completed: 0, total: 50, score: 0, stars: 0 }
+        },
+        totalCompleted: 0,
+        totalQuestions: 500
+      },
+      'pluto': {
         unlockedLevels: [1],
         levelProgress: {
           1: { completed: 0, total: 50, score: 0, stars: 0 }
@@ -225,22 +257,30 @@ export default function PlanetGame() {
 
   const getSuccessMessage = (planet: Planet): string => {
     const messages = {
-      'verb-volcano': 'Volcanic victory! 🌋',
-      'punctuation-port': 'Sailing smoothly! ⚓',
-      'grammar-galaxy': 'Stellar success! 🚀',
-      'vocabulary-village': 'Village victory! 🏘️',
-      'sentence-city': 'City champion! 🏙️'
+      'mercury': 'Mercury mastery! ☄️',
+      'venus': 'Venus victory! 🌋',
+      'earth': 'Earth excellence! 🌍',
+      'mars': 'Martian marvel! 🔴',
+      'jupiter': 'Jovian joy! 🪐',
+      'saturn': 'Saturn success! 💫',
+      'uranus': 'Uranus achievement! 🌊',
+      'neptune': 'Neptune triumph! 🌀',
+      'pluto': 'Pluto perfection! ❄️'
     };
     return messages[planet] || 'Great job! 🎉';
   };
 
   const getEncouragementMessage = (planet: Planet): string => {
     const messages = {
-      'verb-volcano': 'The volcano rumbles... try again! 🌋',
-      'punctuation-port': 'Navigate carefully, sailor! ⚓',
-      'grammar-galaxy': 'Recalculating trajectory... 🚀',
-      'vocabulary-village': 'The villagers believe in you! 🏘️',
-      'sentence-city': 'Rebuild and try again! 🏙️'
+      'mercury': 'The closest planet to success! ☄️',
+      'venus': 'Keep your cool on the hottest planet! 🌋',
+      'earth': 'You\'re on the right planet! 🌍',
+      'mars': 'The Red Planet believes in you! 🔴',
+      'jupiter': 'The largest planet has the biggest heart! 🪐',
+      'saturn': 'Your rings of success are forming! 💫',
+      'uranus': 'Turn things around! 🌊',
+      'neptune': 'Ride the winds of success! 🌀',
+      'pluto': 'Size doesn\'t matter, keep going! ❄️'
     };
     return messages[planet] || 'Keep trying! 💪';
   };
