@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Exercise, Feedback, Progress, Planet, Level, GameSession } from '@/types/curriculum';
 import { planetsInfo, getPlanetLevels, getExercisesForLevel, calculateLevelScore, calculateStars } from '@/lib/curriculum-data';
 
 export default function PlanetGame() {
   const params = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const planetId = params.planet as Planet;
   
   const [currentLevel, setCurrentLevel] = useState<number | null>(null);
@@ -16,6 +18,7 @@ export default function PlanetGame() {
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
+  const [showUrlCopied, setShowUrlCopied] = useState(false);
   
   const [progress, setProgress] = useState<Progress>({
     userId: 'user-1',
@@ -115,6 +118,42 @@ export default function PlanetGame() {
   const planet = planetsInfo.find(p => p.id === planetId);
   const planetLevels = getPlanetLevels(planetId);
 
+  // Handle URL parameters for direct navigation to specific questions
+  useEffect(() => {
+    const levelParam = searchParams.get('level');
+    const questionParam = searchParams.get('question');
+    
+    if (levelParam && questionParam) {
+      const level = parseInt(levelParam);
+      const questionNumber = parseInt(questionParam);
+      
+      if (level && questionNumber && level >= 1 && level <= 10 && questionNumber >= 1 && questionNumber <= 50) {
+        const exercises = getExercisesForLevel(planetId, level);
+        const targetQuestion = exercises.find(ex => ex.questionNumber === questionNumber);
+        
+        if (targetQuestion && exercises.length > 0) {
+          setCurrentLevel(level);
+          setCurrentQuestion(targetQuestion);
+          setUserAnswer('');
+          setFeedback(null);
+          
+          // Initialize game session for URL navigation
+          const session: GameSession = {
+            sessionId: `${planetId}-${level}-${Date.now()}`,
+            planet: planetId,
+            level: level,
+            startTime: Date.now(),
+            currentQuestion: questionNumber,
+            answers: {},
+            totalPoints: 0,
+            completed: false
+          };
+          setGameSession(session);
+        }
+      }
+    }
+  }, [searchParams, planetId]);
+
   const startLevel = (levelNumber: number) => {
     const exercises = getExercisesForLevel(planetId, levelNumber);
     
@@ -128,6 +167,9 @@ export default function PlanetGame() {
     setCurrentLevel(levelNumber);
     setUserAnswer('');
     setFeedback(null);
+    
+    // Update URL to reflect current level and question
+    router.push(`/games/planet/${planetId}?level=${levelNumber}&question=1`);
     
     // Initialize game session
     const session: GameSession = {
@@ -182,17 +224,17 @@ export default function PlanetGame() {
     };
 
     setGameSession(updatedSession);
+  };
 
+  const handleNextQuestion = () => {
+    if (!gameSession || !currentLevel) return;
 
     // Check if level is complete
-    const exercises = getExercisesForLevel(planetId, currentLevel!);
-    if (updatedSession.currentQuestion > exercises.length) {
-      completeLevel(updatedSession);
+    const exercises = getExercisesForLevel(planetId, currentLevel);
+    if (gameSession.currentQuestion > exercises.length) {
+      completeLevel(gameSession);
     } else {
-      // Wait before loading next question
-      setTimeout(() => {
-        loadNextQuestion(updatedSession);
-      }, 2000);
+      loadNextQuestion(gameSession);
     }
   };
 
@@ -209,6 +251,9 @@ export default function PlanetGame() {
       setCurrentQuestion(nextQuestion);
       setUserAnswer('');
       setFeedback(null);
+      
+      // Update URL to reflect current question
+      router.push(`/games/planet/${planetId}?level=${currentLevel}&question=${questionNumber}`);
     } else {
       // No more questions available, complete the level
       completeLevel(currentSession);
@@ -380,6 +425,13 @@ export default function PlanetGame() {
               );
             })}
           </div>
+
+          {/* URL Copied Toast */}
+          {showUrlCopied && (
+            <div className="fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse">
+              ✅ Question URL copied to clipboard!
+            </div>
+          )}
         </div>
       </div>
     );
@@ -401,7 +453,14 @@ export default function PlanetGame() {
               </p>
             </div>
             <button
-              onClick={() => setCurrentLevel(null)}
+              onClick={() => {
+                setCurrentLevel(null);
+                setCurrentQuestion(null);
+                setGameSession(null);
+                setFeedback(null);
+                setUserAnswer('');
+                router.push(`/games/planet/${planetId}`);
+              }}
               className="bg-white/30 hover:bg-white/40 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors text-white font-semibold border border-white/20 shadow-lg"
             >
               ← Levels
@@ -414,6 +473,18 @@ export default function PlanetGame() {
               <div className="text-lg font-bold text-white drop-shadow-lg" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}>
                 Points: {gameSession?.totalPoints || 0} | Question {gameSession?.currentQuestion || 1}/{getExercisesForLevel(planetId, currentLevel!).length}
               </div>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/games/planet/${planetId}?level=${currentLevel}&question=${gameSession?.currentQuestion || 1}`;
+                  navigator.clipboard.writeText(url);
+                  setShowUrlCopied(true);
+                  setTimeout(() => setShowUrlCopied(false), 2000);
+                }}
+                className="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-sm transition-colors border border-white/20"
+                title="Copy question URL"
+              >
+                🔗 Copy URL
+              </button>
             </div>
             <div className="bg-white/20 rounded-full h-3 border border-white/30">
               <div 
@@ -485,19 +556,28 @@ export default function PlanetGame() {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit/Next Button */}
           <div className="flex justify-center">
-            <button
-              onClick={handleSubmit}
-              disabled={!userAnswer || !!feedback}
-              className={`px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg ${
-                !userAnswer || !!feedback
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-purple-600 hover:bg-purple-700 shadow-purple-200'
-              }`}
-            >
-              {feedback ? 'Next Question...' : 'Check Answer'}
-            </button>
+            {!feedback ? (
+              <button
+                onClick={handleSubmit}
+                disabled={!userAnswer}
+                className={`px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg ${
+                  !userAnswer
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-purple-600 hover:bg-purple-700 shadow-purple-200'
+                }`}
+              >
+                Check Answer
+              </button>
+            ) : (
+              <button
+                onClick={handleNextQuestion}
+                className="px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg bg-green-600 hover:bg-green-700 shadow-green-200"
+              >
+                Next Question →
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -533,6 +613,11 @@ export default function PlanetGame() {
               onClick={() => {
                 setShowLevelComplete(false);
                 setCurrentLevel(null);
+                setCurrentQuestion(null);
+                setGameSession(null);
+                setFeedback(null);
+                setUserAnswer('');
+                router.push(`/games/planet/${planetId}`);
               }}
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-bold shadow-lg"
             >

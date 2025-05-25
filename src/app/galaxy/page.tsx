@@ -34,9 +34,11 @@ export default function GalaxyNavigation() {
         totalQuestions: 500
       },
       'earth': {
-        unlockedLevels: [1],
+        unlockedLevels: [1, 2, 3],
         levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
+          1: { completed: 0, total: 50, score: 0, stars: 0 },
+          2: { completed: 0, total: 50, score: 0, stars: 0 },
+          3: { completed: 0, total: 50, score: 0, stars: 0 }
         },
         totalCompleted: 0,
         totalQuestions: 500

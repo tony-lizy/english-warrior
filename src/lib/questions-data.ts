@@ -1,6 +1,15 @@
 import { Exercise } from '@/types/curriculum';
 import { Planet } from '@/types/curriculum';
-import { earthLevel1Questions, earthLevel2Questions } from './earth-questions';
+import { earthLevel1Questions } from './earth-level-1';
+import { earthLevel2Questions } from './earth-level-2';
+import { earthLevel3Questions } from './earth-level-3';
+import { earthLevel4Questions } from './earth-level-4';
+import { earthLevel5Questions } from './earth-level-5';
+import { earthLevel6Questions } from './earth-level-6';
+import { earthLevel7Questions } from './earth-level-7';
+import { earthLevel8Questions } from './earth-level-8';
+import { earthLevel9Questions } from './earth-level-9';
+import { earthLevel10Questions } from './earth-level-10';
 
 export const allQuestions: Exercise[] = [
   {
@@ -662,6 +671,30 @@ export const getQuestionsForLevel = (planet: Planet | string, level: number): Ex
   }
   if (planet === 'earth' && level === 2) {
     return earthLevel2Questions;
+  }
+  if (planet === 'earth' && level === 3) {
+    return earthLevel3Questions;
+  }
+  if (planet === 'earth' && level === 4) {
+    return earthLevel4Questions;
+  }
+  if (planet === 'earth' && level === 5) {
+    return earthLevel5Questions;
+  }
+  if (planet === 'earth' && level === 6) {
+    return earthLevel6Questions;
+  }
+  if (planet === 'earth' && level === 7) {
+    return earthLevel7Questions;
+  }
+  if (planet === 'earth' && level === 8) {
+    return earthLevel8Questions;
+  }
+  if (planet === 'earth' && level === 9) {
+    return earthLevel9Questions;
+  }
+  if (planet === 'earth' && level === 10) {
+    return earthLevel10Questions;
   }
   return allQuestions.filter(q => q.planet === planet && q.level === level);
 };
