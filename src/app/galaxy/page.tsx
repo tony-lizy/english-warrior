@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Progress, Planet } from '@/types/curriculum';
 import { planetsInfo, getPlanetLevels } from '@/lib/curriculum-data';
+import { planetMonsters } from '@/lib/monsters';
 import { useUser } from '@/contexts/UserContext';
 import UserLogin from '@/components/UserLogin';
 import ClientOnly from '@/components/ClientOnly';
@@ -119,6 +120,7 @@ export default function GalaxyNavigation() {
             const isUnlocked = progress.unlockedPlanets.includes(planet.id);
             const planetProgress = progress.planetProgress[planet.id];
             const completionPercentage = calculatePlanetCompletion(planet.id);
+            const monster = planetMonsters[planet.id][0];
             const highestLevel = getHighestUnlockedLevel(planet.id);
             const currentLevelProgress = planetProgress?.levelProgress[highestLevel];
 
@@ -138,6 +140,11 @@ export default function GalaxyNavigation() {
                     <div className="text-6xl mb-4">{planet.icon}</div>
                     <h3 className="text-2xl font-bold mb-2">{planet.name}</h3>
                     <p className="text-white/90 mb-4">{planet.description}</p>
+                    {monster && (
+                      <div className="mb-2 text-lg">
+                        {monster.emoji} <span className="text-sm">{monster.name}</span>
+                      </div>
+                    )}
                     
                     {/* Level Progress */}
                     {isUnlocked && (

@@ -39,11 +39,14 @@ export default function Home() {
       </div>
 
       {/* Main Action */}
-      <div className="mb-12">
+      <div className="mb-12 flex flex-col items-center gap-4">
         <Link href="/galaxy">
           <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-2xl font-bold px-12 py-6 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300">
             🚀 Explore the Galaxy
           </button>
+        </Link>
+        <Link href="/scoreboard" className="text-purple-600 underline font-semibold">
+          View Scoreboard
         </Link>
       </div>
 
