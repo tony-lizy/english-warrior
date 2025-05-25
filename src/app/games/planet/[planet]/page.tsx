@@ -45,9 +45,18 @@ export default function PlanetGame() {
         totalQuestions: 500
       },
       'earth': {
-        unlockedLevels: [1],
+        unlockedLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
+          1: { completed: 0, total: 50, score: 0, stars: 0 },
+          2: { completed: 0, total: 50, score: 0, stars: 0 },
+          3: { completed: 0, total: 50, score: 0, stars: 0 },
+          4: { completed: 0, total: 50, score: 0, stars: 0 },
+          5: { completed: 0, total: 50, score: 0, stars: 0 },
+          6: { completed: 0, total: 50, score: 0, stars: 0 },
+          7: { completed: 0, total: 50, score: 0, stars: 0 },
+          8: { completed: 0, total: 50, score: 0, stars: 0 },
+          9: { completed: 0, total: 50, score: 0, stars: 0 },
+          10: { completed: 0, total: 50, score: 0, stars: 0 }
         },
         totalCompleted: 0,
         totalQuestions: 500
@@ -108,26 +117,14 @@ export default function PlanetGame() {
 
   const startLevel = (levelNumber: number) => {
     const exercises = getExercisesForLevel(planetId, levelNumber);
+    
+    // Only start the level if there are actual exercises available
     if (exercises.length === 0) {
-      // If no exercises available, show sample question
-      const sampleExercise: Exercise = {
-        id: `${planetId}-${levelNumber}-sample`,
-        type: 'multiple-choice',
-        content: `Sample question for Level ${levelNumber}`,
-        correctAnswer: 'This is correct',
-        options: ['This is correct', 'This is wrong', 'Also wrong', 'Still wrong'],
-        explanation: 'This is a sample question to demonstrate the level structure.',
-        planet: planetId,
-        level: levelNumber,
-        questionNumber: 1,
-        points: 10,
-        difficulty: 'beginner'
-      };
-      setCurrentQuestion(sampleExercise);
-    } else {
-      setCurrentQuestion(exercises[0]);
+      console.log('No exercises available for this level');
+      return;
     }
     
+    setCurrentQuestion(exercises[0]);
     setCurrentLevel(levelNumber);
     setUserAnswer('');
     setFeedback(null);
@@ -186,41 +183,36 @@ export default function PlanetGame() {
 
     setGameSession(updatedSession);
 
-    // Check if level is complete (for demo, complete after 5 questions)
-    if (updatedSession.currentQuestion > 5) {
+
+    // Check if level is complete
+    const exercises = getExercisesForLevel(planetId, currentLevel!);
+    if (updatedSession.currentQuestion > exercises.length) {
       completeLevel(updatedSession);
     } else {
       // Wait before loading next question
       setTimeout(() => {
-        loadNextQuestion();
+        loadNextQuestion(updatedSession);
       }, 2000);
     }
   };
 
-  const loadNextQuestion = () => {
-    if (!gameSession || !currentLevel) return;
+  const loadNextQuestion = (session?: GameSession) => {
+    const currentSession = session || gameSession;
+    if (!currentSession || !currentLevel) return;
     
-    // For demo purposes, generate a new sample question
-    const questionNumber = gameSession.currentQuestion;
-    const levelData = planetLevels.find(l => l.levelNumber === currentLevel);
+    const exercises = getExercisesForLevel(planetId, currentLevel);
+    const questionNumber = currentSession.currentQuestion;
+    // Get the next question from the actual exercises
+    const nextQuestion = exercises.find(ex => ex.questionNumber === questionNumber);
     
-    const nextQuestion: Exercise = {
-      id: `${planetId}-${currentLevel}-${questionNumber}`,
-      type: 'multiple-choice',
-      content: `${levelData?.name} - Question ${questionNumber}`,
-      correctAnswer: 'Correct answer',
-      options: ['Correct answer', 'Wrong answer 1', 'Wrong answer 2', 'Wrong answer 3'],
-      explanation: `This explains why the answer is correct for ${levelData?.name}.`,
-      planet: planetId,
-      level: currentLevel,
-      questionNumber,
-      points: 10,
-      difficulty: levelData?.difficulty || 'beginner'
-    };
-
-    setCurrentQuestion(nextQuestion);
-    setUserAnswer('');
-    setFeedback(null);
+    if (nextQuestion) {
+      setCurrentQuestion(nextQuestion);
+      setUserAnswer('');
+      setFeedback(null);
+    } else {
+      // No more questions available, complete the level
+      completeLevel(currentSession);
+    }
   };
 
   const completeLevel = (session: GameSession) => {
@@ -328,20 +320,22 @@ export default function PlanetGame() {
               const isUnlocked = planetProgress?.unlockedLevels.includes(level.levelNumber) || level.levelNumber === 1;
               const levelProgress = planetProgress?.levelProgress[level.levelNumber];
               const isCompleted = levelProgress?.completed === 50;
+              const exercises = getExercisesForLevel(planetId, level.levelNumber);
+              const hasExercises = exercises.length > 0;
               
               return (
                 <div
                   key={level.id}
                   className={`relative p-6 rounded-xl transform transition-all duration-200 ${
-                    isUnlocked 
+                    isUnlocked && hasExercises
                       ? 'bg-white/90 hover:bg-white hover:scale-105 cursor-pointer shadow-lg hover:shadow-xl' 
                       : 'bg-gray-800/60 cursor-not-allowed opacity-75'
                   } backdrop-blur-sm border ${
-                    isUnlocked 
+                    isUnlocked && hasExercises
                       ? 'border-white/40 hover:border-white/60' 
                       : 'border-gray-600/40'
                   }`}
-                  onClick={() => isUnlocked && startLevel(level.levelNumber)}
+                  onClick={() => isUnlocked && hasExercises && startLevel(level.levelNumber)}
                 >
                   <div className={`text-center ${isUnlocked ? 'text-gray-800' : 'text-gray-300'}`}>
                     <div className={`text-3xl font-bold mb-3 ${
@@ -374,6 +368,13 @@ export default function PlanetGame() {
                         <div className="text-4xl opacity-80">🔒</div>
                       </div>
                     )}
+                    
+                    {isUnlocked && !hasExercises && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900/40 rounded-xl">
+                        <div className="text-3xl opacity-80 mb-2">🚧</div>
+                        <div className="text-sm text-white font-semibold">Coming Soon</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -392,11 +393,11 @@ export default function PlanetGame() {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="text-white drop-shadow-lg">
-              <h1 className="text-3xl font-bold text-white drop-shadow-md">
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
                 {planet.icon} Level {currentLevel}
               </h1>
-              <p className="text-white/90 text-lg mt-2 drop-shadow-sm">
-                Question {gameSession?.currentQuestion || 1} of 50
+              <p className="text-white text-lg mt-2 drop-shadow-lg" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}>
+                Question {gameSession?.currentQuestion || 1} of {getExercisesForLevel(planetId, currentLevel!).length}
               </p>
             </div>
             <button
@@ -408,17 +409,17 @@ export default function PlanetGame() {
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-white/30 backdrop-blur-sm rounded-xl p-4 mb-8 text-white border border-white/20 shadow-lg">
+          <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 mb-8 text-white border border-white/30 shadow-lg">
             <div className="flex justify-between items-center mb-4">
-              <div className="text-lg font-bold text-white drop-shadow-sm">
-                Points: {gameSession?.totalPoints || 0} | Question {gameSession?.currentQuestion || 1}/50
+              <div className="text-lg font-bold text-white drop-shadow-lg" style={{ textShadow: '1px 1px 3px rgba(0,0,0,0.8)' }}>
+                Points: {gameSession?.totalPoints || 0} | Question {gameSession?.currentQuestion || 1}/{getExercisesForLevel(planetId, currentLevel!).length}
               </div>
             </div>
             <div className="bg-white/20 rounded-full h-3 border border-white/30">
               <div 
                 className="bg-white rounded-full h-3 transition-all duration-500 shadow-sm"
                 style={{ 
-                  width: `${((gameSession?.currentQuestion || 1) / 50) * 100}%` 
+                  width: `${((gameSession?.currentQuestion || 1) / getExercisesForLevel(planetId, currentLevel!).length) * 100}%` 
                 }}
               />
             </div>
@@ -457,7 +458,7 @@ export default function PlanetGame() {
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
                   placeholder={currentQuestion.type === 'fill-in-blank' ? 'Type your answer...' : 'Type the corrected sentence...'}
-                  className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-lg"
+                  className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-lg text-gray-900"
                   rows={currentQuestion.type === 'correction' ? 3 : 2}
                   disabled={!!feedback}
                 />

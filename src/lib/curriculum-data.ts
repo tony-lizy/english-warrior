@@ -27,9 +27,9 @@ export const planetsInfo: PlanetInfo[] = [
     name: 'Earth',
     description: 'Our home planet where you\'ll explore the foundations of grammar!',
     theme: 'Blue oceans and green continents',
-    focus: ['Nouns', 'Adjectives', 'Adverbs', 'Articles', 'Pronouns', 'Parts of speech'],
+    focus: ['Past tense', 'Past participle', 'Nouns', 'Adjectives', 'Adverbs', 'Parts of speech'],
     icon: '🌍',
-    color: 'from-blue-500 to-green-600',
+    color: 'from-gray-900 to-black',
     levels: 10
   },
   {
@@ -284,8 +284,8 @@ export const levels: Level[] = [
     id: 'earth-1',
     planet: 'earth',
     levelNumber: 1,
-    name: 'Noun Basics',
-    description: 'Identify people, places, and things',
+    name: 'Past Tense Mastery',
+    description: 'Master past tense and past participle forms',
     difficulty: 'beginner',
     questionsCount: 50
   },

@@ -1,10 +1,7 @@
-import { Redis } from '@upstash/redis';
+import Redis from 'ioredis';
 
 // Initialize Redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
-});
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // Types
 export interface UserScore {
@@ -23,8 +20,9 @@ export interface UserStatus {
 
 // Score related functions
 export const getUserScore = async (userId: string): Promise<UserScore | null> => {
-  const score = await redis.get<UserScore>(`score:${userId}`);
-  return score;
+  const scoreData = await redis.get(`score:${userId}`);
+  if (!scoreData) return null;
+  return JSON.parse(scoreData) as UserScore;
 };
 
 export const updateUserScore = async (
@@ -41,19 +39,22 @@ export const updateUserScore = async (
     completedLevels.push(levelKey);
   }
 
-  await redis.set(`score:${userId}`, {
+  const updatedScore: UserScore = {
     score: (currentScore?.score || 0) + score,
     lastUpdated: new Date().toISOString(),
     currentPlanet: planet,
     currentLevel: level,
     completedLevels,
-  });
+  };
+
+  await redis.set(`score:${userId}`, JSON.stringify(updatedScore));
 };
 
 // Status related functions
 export const getUserStatus = async (userId: string): Promise<UserStatus | null> => {
-  const status = await redis.get<UserStatus>(`status:${userId}`);
-  return status;
+  const statusData = await redis.get(`status:${userId}`);
+  if (!statusData) return null;
+  return JSON.parse(statusData) as UserStatus;
 };
 
 export const updateUserStatus = async (
@@ -61,11 +62,13 @@ export const updateUserStatus = async (
   isActive: boolean,
   currentQuestion: number
 ): Promise<void> => {
-  await redis.set(`status:${userId}`, {
+  const updatedStatus: UserStatus = {
     isActive,
     lastActive: new Date().toISOString(),
     currentQuestion,
-  });
+  };
+
+  await redis.set(`status:${userId}`, JSON.stringify(updatedStatus));
 };
 
 // Initialize user data
@@ -84,8 +87,8 @@ export const initializeUser = async (userId: string): Promise<void> => {
     currentQuestion: 1,
   };
 
-  await redis.set(`score:${userId}`, initialScore);
-  await redis.set(`status:${userId}`, initialStatus);
+  await redis.set(`score:${userId}`, JSON.stringify(initialScore));
+  await redis.set(`status:${userId}`, JSON.stringify(initialStatus));
 };
 
 // Get user progress

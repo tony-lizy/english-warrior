@@ -144,7 +144,7 @@ export default function GalaxyNavigation() {
         </div>
 
         {/* Planets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {planetsInfo.map((planet) => {
             const isUnlocked = progress.unlockedPlanets.includes(planet.id);
             const planetProgress = progress.planetProgress[planet.id];
@@ -155,16 +155,16 @@ export default function GalaxyNavigation() {
             return (
               <div
                 key={planet.id}
-                className={`relative transform transition-all duration-300 ${
+                className={`relative transform transition-all duration-300 flex ${
                   isUnlocked ? 'hover:scale-105' : 'opacity-50'
                 }`}
               >
                 {/* Planet Card */}
-                <div className={`bg-gradient-to-br ${planet.color} rounded-2xl p-6 shadow-2xl ${
+                <div className={`bg-gradient-to-br ${planet.color} rounded-2xl p-6 shadow-2xl flex-1 flex flex-col ${
                   !isUnlocked && 'grayscale'
                 }`}>
                   {/* Planet Content */}
-                  <div className="text-center text-white">
+                  <div className="text-center text-white flex flex-col h-full">
                     <div className="text-6xl mb-4">{planet.icon}</div>
                     <h3 className="text-2xl font-bold mb-2">{planet.name}</h3>
                     <p className="text-white/90 mb-4">{planet.description}</p>
@@ -198,7 +198,7 @@ export default function GalaxyNavigation() {
                     )}
 
                     {/* Focus Areas */}
-                    <div className="mb-4">
+                    <div className="mb-4 flex-grow">
                       <div className="text-sm font-semibold mb-2">Focus Areas:</div>
                       <div className="flex flex-wrap gap-1 justify-center">
                         {planet.focus.slice(0, 3).map(focus => (
@@ -215,17 +215,19 @@ export default function GalaxyNavigation() {
                     </div>
 
                     {/* Action Button */}
-                    {isUnlocked ? (
-                      <Link href={`/games/planet/${planet.id}`}>
-                        <button className="bg-white text-purple-600 px-6 py-2 rounded-full font-bold hover:bg-purple-100 transition-colors">
-                          {planetProgress?.totalCompleted === 0 ? 'Start Journey' : 'Continue'}
+                    <div className="mt-auto">
+                      {isUnlocked ? (
+                        <Link href={`/games/planet/${planet.id}`}>
+                          <button className="bg-white text-purple-600 px-6 py-2 rounded-full font-bold hover:bg-purple-100 transition-colors">
+                            {planetProgress?.totalCompleted === 0 ? 'Start Journey' : 'Continue'}
+                          </button>
+                        </Link>
+                      ) : (
+                        <button disabled className="bg-gray-500 text-white px-6 py-2 rounded-full font-bold cursor-not-allowed">
+                          Locked
                         </button>
-                      </Link>
-                    ) : (
-                      <button disabled className="bg-gray-500 text-white px-6 py-2 rounded-full font-bold cursor-not-allowed">
-                        Locked
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
