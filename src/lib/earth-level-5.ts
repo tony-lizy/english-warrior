@@ -118,10 +118,9 @@ export const earthLevel5Questions: Exercise[] = [
   },
   {
     id: 'earth-5-10',
-    type: 'multiple-choice',
-    content: 'Choose the correct form: "The window has been _____."',
+    type: 'fill-in-blank',
+    content: 'Complete: "The window has been _____ (break)."',
     correctAnswer: 'broken',
-    options: ['break', 'broke', 'broken', 'breaking'],
     explanation: 'Passive voice uses "been + past participle".',
     planet: 'earth',
     level: 5,

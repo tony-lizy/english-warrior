@@ -32,22 +32,6 @@ export default function PlanetGame() {
     }
   }, [progress]);
 
-  // Show login if no user
-  if (!user || !progress || !localProgress) {
-    return (
-      <ClientOnly fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-        </div>
-      }>
-        <UserLogin />
-      </ClientOnly>
-    );
-  }
-
-  const planet = planetsInfo.find(p => p.id === planetId);
-  const planetLevels = getPlanetLevels(planetId);
-
   // Handle URL parameters for direct navigation to specific questions
   useEffect(() => {
     const levelParam = searchParams.get('level');
@@ -83,6 +67,22 @@ export default function PlanetGame() {
       }
     }
   }, [searchParams, planetId]);
+
+  const planet = planetsInfo.find(p => p.id === planetId);
+  const planetLevels = getPlanetLevels(planetId);
+
+  // Show login if no user
+  if (!user || !progress || !localProgress) {
+    return (
+      <ClientOnly fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
+      }>
+        <UserLogin />
+      </ClientOnly>
+    );
+  }
 
   const startLevel = (levelNumber: number) => {
     const exercises = getExercisesForLevel(planetId, levelNumber);
