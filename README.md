@@ -8,6 +8,8 @@ An interactive web-based English learning game designed for children to improve 
 - Vocabulary building exercises
 - Spelling challenges
 - Progress tracking
+- Scoreboard with top player rankings
+- Monster guardians for each planet
 - Kid-friendly interface
 - Engaging animations and sounds
 
@@ -39,6 +41,12 @@ An interactive web-based English learning game designed for children to improve 
 - `/src/lib` - Utility functions and game logic
 - `/src/types` - TypeScript type definitions
 - `/public` - Static assets (images, sounds, etc.)
+
+## Scoreboard
+
+After completing levels, your points are stored in the browser and ranked on the
+scoreboard page. Visit `/scoreboard` to see the top players and compare your
+progress with others.
 
 ## Contributing
 
