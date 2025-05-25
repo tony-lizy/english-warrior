@@ -5,8 +5,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "env": {
-    "REDIS_URL": "@redis_url"
-  }
+  ]
 } 
