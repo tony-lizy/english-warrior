@@ -5,12 +5,16 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Exercise, Feedback, Progress, Planet, Level, GameSession } from '@/types/curriculum';
 import { planetsInfo, getPlanetLevels, getExercisesForLevel, calculateLevelScore, calculateStars } from '@/lib/curriculum-data';
+import { useUser } from '@/contexts/UserContext';
+import UserLogin from '@/components/UserLogin';
+import ClientOnly from '@/components/ClientOnly';
 
 export default function PlanetGame() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
   const planetId = params.planet as Planet;
+  const { user, progress, updateProgress, logout } = useUser();
   
   const [currentLevel, setCurrentLevel] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Exercise | null>(null);
@@ -19,101 +23,27 @@ export default function PlanetGame() {
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [showUrlCopied, setShowUrlCopied] = useState(false);
-  
-  const [progress, setProgress] = useState<Progress>({
-    userId: 'user-1',
-    completedExercises: [],
-    currentLevel: 'beginner',
-    ageGroup: '8-9',
-    totalPoints: 0,
-    streak: 0,
-    unlockedPlanets: ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
-    planetProgress: {
-      'mercury': {
-        unlockedLevels: [1, 2, 3],
-        levelProgress: {
-          1: { completed: 50, total: 50, score: 85, stars: 2 },
-          2: { completed: 30, total: 50, score: 0, stars: 0 },
-          3: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 80,
-        totalQuestions: 500
-      },
-      'venus': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 20, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 20,
-        totalQuestions: 500
-      },
-      'earth': {
-        unlockedLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 },
-          2: { completed: 0, total: 50, score: 0, stars: 0 },
-          3: { completed: 0, total: 50, score: 0, stars: 0 },
-          4: { completed: 0, total: 50, score: 0, stars: 0 },
-          5: { completed: 0, total: 50, score: 0, stars: 0 },
-          6: { completed: 0, total: 50, score: 0, stars: 0 },
-          7: { completed: 0, total: 50, score: 0, stars: 0 },
-          8: { completed: 0, total: 50, score: 0, stars: 0 },
-          9: { completed: 0, total: 50, score: 0, stars: 0 },
-          10: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'mars': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'jupiter': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'saturn': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'uranus': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'neptune': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'pluto': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      }
+  const [localProgress, setLocalProgress] = useState<Progress | null>(null);
+
+  // Initialize local progress when progress is available
+  useEffect(() => {
+    if (progress) {
+      setLocalProgress(progress);
     }
-  });
+  }, [progress]);
+
+  // Show login if no user
+  if (!user || !progress || !localProgress) {
+    return (
+      <ClientOnly fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
+      }>
+        <UserLogin />
+      </ClientOnly>
+    );
+  }
 
   const planet = planetsInfo.find(p => p.id === planetId);
   const planetLevels = getPlanetLevels(planetId);
@@ -267,15 +197,15 @@ export default function PlanetGame() {
     const stars = calculateStars(score);
 
     // Update progress
-    setProgress(prev => ({
-      ...prev,
-      totalPoints: prev.totalPoints + session.totalPoints,
+    const updatedProgress = {
+      ...localProgress!,
+      totalPoints: localProgress!.totalPoints + session.totalPoints,
       planetProgress: {
-        ...prev.planetProgress,
+        ...localProgress!.planetProgress,
         [planetId]: {
-          ...prev.planetProgress[planetId],
+          ...localProgress!.planetProgress[planetId],
           levelProgress: {
-            ...prev.planetProgress[planetId].levelProgress,
+            ...localProgress!.planetProgress[planetId].levelProgress,
             [currentLevel!]: {
               completed: 50, // Mark as complete
               total: 50,
@@ -283,10 +213,13 @@ export default function PlanetGame() {
               stars
             }
           },
-          totalCompleted: prev.planetProgress[planetId].totalCompleted + totalQuestions
+          totalCompleted: localProgress!.planetProgress[planetId].totalCompleted + totalQuestions
         }
       }
-    }));
+    };
+    
+    setLocalProgress(updatedProgress);
+    updateProgress(updatedProgress);
 
     setGameSession({ ...session, completed: true });
     setShowLevelComplete(true);
@@ -339,11 +272,29 @@ export default function PlanetGame() {
 
   // Level Selection View
   if (!currentLevel) {
-    const planetProgress = progress.planetProgress[planetId];
+    const planetProgress = localProgress!.planetProgress[planetId];
     
     return (
       <div className={`min-h-screen bg-gradient-to-br ${planet.color} p-6`}>
         <div className="max-w-4xl mx-auto">
+          {/* User Header */}
+          <ClientOnly>
+            <div className="fixed top-4 right-4 z-50">
+              <div className="bg-white/10 backdrop-blur-lg rounded-lg px-4 py-2 border border-white/20 shadow-lg">
+                <div className="flex items-center gap-3 text-white">
+                  <span className="text-sm">👋 {user.name}</span>
+                  <button
+                    onClick={logout}
+                    className="text-xs bg-red-500/80 hover:bg-red-600 px-2 py-1 rounded transition-colors"
+                    title="Logout"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ClientOnly>
+
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="text-white drop-shadow-lg">

@@ -1,10 +1,31 @@
 'use client';
 
 import Link from 'next/link';
+import { useUser } from '@/contexts/UserContext';
+import UserLogin from '@/components/UserLogin';
 
 export default function Home() {
+  const { user, isLoading } = useUser();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  // Show login if no user
+  if (!user) {
+    return <UserLogin />;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center">
+      {/* User Header */}
+      <UserHeader />
+      
       <div className="mb-8">
         <h1 className="text-6xl font-bold text-purple-600 mb-6">
           English Warrior
@@ -98,6 +119,27 @@ function FeatureCard({
       <div className="text-4xl mb-4">{icon}</div>
       <h3 className="text-xl font-bold mb-2">{title}</h3>
       <p className="text-white/90">{description}</p>
+    </div>
+  );
+}
+
+function UserHeader() {
+  const { user, logout } = useUser();
+  
+  return (
+    <div className="fixed top-4 right-4 z-50">
+      <div className="bg-white/10 backdrop-blur-lg rounded-lg px-4 py-2 border border-white/20 shadow-lg">
+        <div className="flex items-center gap-3 text-white">
+          <span className="text-sm">👋 Welcome, {user?.name}!</span>
+          <button
+            onClick={logout}
+            className="text-xs bg-red-500/80 hover:bg-red-600 px-2 py-1 rounded transition-colors"
+            title="Logout"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

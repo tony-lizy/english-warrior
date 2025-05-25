@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { UserProvider } from "@/contexts/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gradient-to-b from-blue-100 to-purple-100 min-h-screen`}>
-        <main className="container mx-auto px-4 py-8">
-          {children}
-        </main>
+        <UserProvider>
+          <main className="container mx-auto px-4 py-8">
+            {children}
+          </main>
+        </UserProvider>
       </body>
     </html>
   );

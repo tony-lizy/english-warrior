@@ -4,95 +4,36 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Progress, Planet } from '@/types/curriculum';
 import { planetsInfo, getPlanetLevels } from '@/lib/curriculum-data';
+import { useUser } from '@/contexts/UserContext';
+import UserLogin from '@/components/UserLogin';
+import ClientOnly from '@/components/ClientOnly';
 
 export default function GalaxyNavigation() {
-  const [progress, setProgress] = useState<Progress>({
-    userId: 'user-1',
-    completedExercises: [],
-    currentLevel: 'beginner',
-    ageGroup: '8-9',
-    totalPoints: 250,
-    streak: 5,
-    unlockedPlanets: ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'],
-    planetProgress: {
-      'mercury': {
-        unlockedLevels: [1, 2, 3],
-        levelProgress: {
-          1: { completed: 50, total: 50, score: 85, stars: 2 },
-          2: { completed: 30, total: 50, score: 0, stars: 0 },
-          3: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 80,
-        totalQuestions: 500
-      },
-      'venus': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 20, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 20,
-        totalQuestions: 500
-      },
-      'earth': {
-        unlockedLevels: [1, 2, 3],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 },
-          2: { completed: 0, total: 50, score: 0, stars: 0 },
-          3: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'mars': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'jupiter': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'saturn': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'uranus': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'neptune': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      },
-      'pluto': {
-        unlockedLevels: [1],
-        levelProgress: {
-          1: { completed: 0, total: 50, score: 0, stars: 0 }
-        },
-        totalCompleted: 0,
-        totalQuestions: 500
-      }
-    }
-  });
+  const { user, progress, isLoading, logout, unlockAllLevels } = useUser();
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
+  // Show login if no user
+  if (!user || !progress) {
+    return (
+      <ClientOnly fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
+      }>
+        <UserLogin />
+      </ClientOnly>
+    );
+  }
+
+
 
   const renderStars = (count: number) => {
     return '⭐'.repeat(count) + '☆'.repeat(3 - count);
@@ -113,6 +54,33 @@ export default function GalaxyNavigation() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-pink-800 p-6">
       <div className="max-w-6xl mx-auto">
+        {/* User Header */}
+        <ClientOnly>
+          <div className="fixed top-4 right-4 z-50 space-y-2">
+            <div className="bg-white/10 backdrop-blur-lg rounded-lg px-4 py-2 border border-white/20 shadow-lg">
+              <div className="flex items-center gap-3 text-white">
+                <span className="text-sm">👋 {user.name}</span>
+                <button
+                  onClick={logout}
+                  className="text-xs bg-red-500/80 hover:bg-red-600 px-2 py-1 rounded transition-colors"
+                  title="Logout"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-lg rounded-lg px-4 py-2 border border-white/20 shadow-lg">
+              <button
+                onClick={unlockAllLevels}
+                className="text-xs bg-green-500/80 hover:bg-green-600 px-2 py-1 rounded transition-colors text-white"
+                title="Unlock All Levels (Testing)"
+              >
+                🔓 Unlock All
+              </button>
+            </div>
+          </div>
+        </ClientOnly>
+
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-4">
