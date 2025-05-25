@@ -10,6 +10,8 @@ An interactive web-based English learning game designed for children to improve 
 - Progress tracking
 - Kid-friendly interface
 - Engaging animations and sounds
+- Scoreboard with top player rankings
+- Unique monsters guarding each planet
 
 ## Tech Stack
 
