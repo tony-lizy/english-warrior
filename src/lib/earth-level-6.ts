@@ -32,12 +32,17 @@ export const earthLevel6Questions: Exercise[] = [
     type: 'fill-in-blank',
     content: 'Complete: "While I _____ (study), my brother _____ (watch) TV."',
     correctAnswer: 'was studying, was watching',
-    explanation: 'Both actions were ongoing simultaneously in the past.',
+    explanation: 'Both actions were ongoing simultaneously in the past. We use past continuous (was/were + -ing) for actions happening at the same time. "While I was studying" shows one ongoing action, and "my brother was watching TV" shows another ongoing action happening at the same time.',
     planet: 'earth',
     level: 6,
     questionNumber: 3,
     points: 10,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
+    blanks: {
+      count: 2,
+      answers: ['was studying', 'was watching'],
+      labels: ['first blank (study)', 'second blank (watch)']
+    }
   },
   {
     id: 'earth-6-4',
@@ -70,12 +75,17 @@ export const earthLevel6Questions: Exercise[] = [
     type: 'fill-in-blank',
     content: 'Complete: "After he _____ (finish) his work, he _____ (go) home."',
     correctAnswer: 'had finished, went',
-    explanation: 'Past perfect for the first action, simple past for the second.',
+    explanation: 'We use past perfect (had + past participle) for the action that happened first, and simple past for the action that happened second. "After he had finished his work" shows the first completed action, then "he went home" shows what happened next.',
     planet: 'earth',
     level: 6,
     questionNumber: 6,
     points: 10,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
+    blanks: {
+      count: 2,
+      answers: ['had finished', 'went'],
+      labels: ['first blank (finish)', 'second blank (go)']
+    }
   },
   {
     id: 'earth-6-7',
@@ -133,12 +143,17 @@ export const earthLevel6Questions: Exercise[] = [
     type: 'fill-in-blank',
     content: 'Complete: "While it _____ (rain), we _____ (stay) inside."',
     correctAnswer: 'was raining, stayed',
-    explanation: 'Past continuous for ongoing condition, simple past for completed action.',
+    explanation: 'We use past continuous (was/were + -ing) for the ongoing background action "it was raining", and simple past for the completed action "we stayed inside". The rain was continuing while we made the decision to stay inside.',
     planet: 'earth',
     level: 6,
     questionNumber: 11,
     points: 10,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
+    blanks: {
+      count: 2,
+      answers: ['was raining', 'stayed'],
+      labels: ['first blank (rain)', 'second blank (stay)']
+    }
   },
   {
     id: 'earth-6-12',
@@ -184,12 +199,17 @@ export const earthLevel6Questions: Exercise[] = [
     type: 'fill-in-blank',
     content: 'Complete: "She _____ (live) in Paris for five years before she _____ (move) to London."',
     correctAnswer: 'had lived, moved',
-    explanation: 'Past perfect for duration before another past action.',
+    explanation: 'We use past perfect (had + past participle) for actions that were completed before another past action. "She had lived in Paris for five years" shows the duration of the first action, then "she moved to London" shows what happened next.',
     planet: 'earth',
     level: 6,
     questionNumber: 15,
     points: 10,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
+    blanks: {
+      count: 2,
+      answers: ['had lived', 'moved'],
+      labels: ['first blank (live)', 'second blank (move)']
+    }
   },
   {
     id: 'earth-6-16',
@@ -247,12 +267,17 @@ export const earthLevel6Questions: Exercise[] = [
     type: 'fill-in-blank',
     content: 'Complete: "While she _____ (cook), he _____ (set) the table."',
     correctAnswer: 'was cooking, was setting',
-    explanation: 'Both actions were ongoing simultaneously in the past.',
+    explanation: 'Both actions were ongoing simultaneously in the past. We use past continuous (was/were + -ing) for both actions because they were happening at the same time. "While she was cooking" and "he was setting the table" shows two people doing different things at the same moment.',
     planet: 'earth',
     level: 6,
     questionNumber: 20,
     points: 10,
-    difficulty: 'intermediate'
+    difficulty: 'intermediate',
+    blanks: {
+      count: 2,
+      answers: ['was cooking', 'was setting'],
+      labels: ['first blank (cook)', 'second blank (set)']
+    }
   },
   {
     id: 'earth-6-21',

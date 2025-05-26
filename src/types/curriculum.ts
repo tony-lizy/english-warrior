@@ -44,6 +44,12 @@ export interface Exercise {
   difficulty: DifficultyLevel;
   timeLimit?: number;
   tags?: string[];
+  // For multi-blank questions
+  blanks?: {
+    count: number; // Number of blanks
+    answers: string[]; // Array of correct answers for each blank
+    labels?: string[]; // Optional labels for each blank
+  };
 }
 
 export interface Progress {

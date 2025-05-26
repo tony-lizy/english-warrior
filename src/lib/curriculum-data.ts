@@ -85,9 +85,9 @@ export const planetsInfo: PlanetInfo[] = [
   {
     id: 'pluto',
     name: 'Pluto',
-    description: 'The dwarf planet where you\'ll become a master of English!',
+    description: 'The dwarf planet where you\'ll master reading comprehension and become an English expert!',
     theme: 'Icy surface with heart-shaped feature',
-    focus: ['Mastery challenges', 'Advanced grammar', 'Complex vocabulary', 'Writing excellence'],
+    focus: ['Reading comprehension', 'Text analysis', 'Critical thinking', 'Non-fiction texts', 'Science passages', 'Inference skills'],
     icon: '❄️',
     color: 'from-gray-400 to-blue-500',
     levels: 10
@@ -836,8 +836,8 @@ export const levels: Level[] = [
     id: 'pluto-1',
     planet: 'pluto',
     levelNumber: 1,
-    name: 'Mastery Basics',
-    description: 'Foundational skills review',
+    name: 'Reading Explorer',
+    description: 'Master reading comprehension with engaging non-fiction passages',
     difficulty: 'beginner',
     questionsCount: 50
   },

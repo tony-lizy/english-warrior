@@ -8,9 +8,11 @@ import { planetMonsters } from '@/lib/monsters';
 import { useUser } from '@/contexts/UserContext';
 import UserLogin from '@/components/UserLogin';
 import ClientOnly from '@/components/ClientOnly';
+import Leaderboard from '@/components/Leaderboard';
 
 export default function GalaxyNavigation() {
   const { user, progress, isLoading, logout, unlockAllLevels } = useUser();
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Show loading state
   if (isLoading) {
@@ -90,6 +92,16 @@ export default function GalaxyNavigation() {
           <p className="text-xl text-purple-200 mb-6">
             Explore planets with 10 levels each and master English skills!
           </p>
+          
+          {/* Global Leaderboard Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              className="bg-yellow-500/80 hover:bg-yellow-600/80 backdrop-blur-sm px-6 py-3 rounded-lg transition-colors text-white font-semibold border border-yellow-400/20 shadow-lg flex items-center gap-2 mx-auto"
+            >
+              🏆 Global Leaderboard
+            </button>
+          </div>
           
           {/* Progress Summary */}
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8">
@@ -233,6 +245,26 @@ export default function GalaxyNavigation() {
             </div>
           </div>
         </div>
+
+        {/* Leaderboard Modal */}
+        {showLeaderboard && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <h2 className="text-2xl font-bold text-gray-800">🏆 Global Leaderboard</h2>
+                <button
+                  onClick={() => setShowLeaderboard(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="overflow-y-auto max-h-[60vh]">
+                <Leaderboard currentUserId={user?.id} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

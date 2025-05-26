@@ -10,6 +10,7 @@ import { earthLevel7Questions } from './earth-level-7';
 import { earthLevel8Questions } from './earth-level-8';
 import { earthLevel9Questions } from './earth-level-9';
 import { earthLevel10Questions } from './earth-level-10';
+import { plutoLevel1Questions } from './pluto-level-1';
 
 export const allQuestions: Exercise[] = [
   {
@@ -695,6 +696,9 @@ export const getQuestionsForLevel = (planet: Planet | string, level: number): Ex
   }
   if (planet === 'earth' && level === 10) {
     return earthLevel10Questions;
+  }
+  if (planet === 'pluto' && level === 1) {
+    return plutoLevel1Questions;
   }
   return allQuestions.filter(q => q.planet === planet && q.level === level);
 };

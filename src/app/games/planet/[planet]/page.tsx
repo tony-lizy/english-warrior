@@ -8,6 +8,8 @@ import { planetsInfo, getPlanetLevels, getExercisesForLevel, calculateLevelScore
 import { useUser } from '@/contexts/UserContext';
 import UserLogin from '@/components/UserLogin';
 import ClientOnly from '@/components/ClientOnly';
+import { LeaderboardService } from '@/lib/leaderboard';
+import Leaderboard from '@/components/Leaderboard';
 
 export default function PlanetGame() {
   const params = useParams();
@@ -19,11 +21,13 @@ export default function PlanetGame() {
   const [currentLevel, setCurrentLevel] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<Exercise | null>(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const [userAnswers, setUserAnswers] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [showUrlCopied, setShowUrlCopied] = useState(false);
   const [localProgress, setLocalProgress] = useState<Progress | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Initialize local progress when progress is available
   useEffect(() => {
@@ -49,6 +53,7 @@ export default function PlanetGame() {
           setCurrentLevel(level);
           setCurrentQuestion(targetQuestion);
           setUserAnswer('');
+          setUserAnswers([]);
           setFeedback(null);
           
           // Initialize game session for URL navigation
@@ -96,6 +101,7 @@ export default function PlanetGame() {
     setCurrentQuestion(exercises[0]);
     setCurrentLevel(levelNumber);
     setUserAnswer('');
+    setUserAnswers([]);
     setFeedback(null);
     
     // Update URL to reflect current level and question
@@ -118,9 +124,28 @@ export default function PlanetGame() {
   const handleSubmit = () => {
     if (!currentQuestion || !gameSession) return;
 
-    const isCorrect = Array.isArray(currentQuestion.correctAnswer)
-      ? currentQuestion.correctAnswer.includes(userAnswer)
-      : userAnswer.toLowerCase().trim() === currentQuestion.correctAnswer.toLowerCase().trim();
+    let isCorrect = false;
+    let finalUserAnswer = '';
+
+    // Handle multi-blank questions
+    if (currentQuestion.blanks && currentQuestion.blanks.count > 1) {
+      // Check if all blanks are filled
+      if (userAnswers.length !== currentQuestion.blanks.count || userAnswers.some(answer => !answer.trim())) {
+        return; // Don't submit if not all blanks are filled
+      }
+      
+      // Check if all answers are correct
+      isCorrect = userAnswers.every((answer, index) => 
+        answer.toLowerCase().trim() === currentQuestion.blanks!.answers[index].toLowerCase().trim()
+      );
+      finalUserAnswer = userAnswers.join(', ');
+    } else {
+      // Handle single answer questions
+      isCorrect = Array.isArray(currentQuestion.correctAnswer)
+        ? currentQuestion.correctAnswer.includes(userAnswer)
+        : userAnswer.toLowerCase().trim() === currentQuestion.correctAnswer.toLowerCase().trim();
+      finalUserAnswer = userAnswer;
+    }
 
     const pointsEarned = isCorrect ? currentQuestion.points : 0;
     
@@ -143,7 +168,7 @@ export default function PlanetGame() {
         ...gameSession.answers,
         [currentQuestion.questionNumber]: {
           questionId: currentQuestion.id,
-          userAnswer,
+          userAnswer: finalUserAnswer,
           correct: isCorrect,
           timeSpent: Date.now() - gameSession.startTime,
           pointsEarned
@@ -193,7 +218,13 @@ export default function PlanetGame() {
     if (nextQuestion) {
       setCurrentQuestion(nextQuestion);
       setUserAnswer('');
+      setUserAnswers([]);
       setFeedback(null);
+      
+      // Update the game session state with the current session to preserve points
+      if (session) {
+        setGameSession(session);
+      }
       
       // Update URL to reflect current question
       router.push(`/games/planet/${planetId}?level=${currentLevel}&question=${questionNumber}`);
@@ -233,6 +264,21 @@ export default function PlanetGame() {
     
     setLocalProgress(updatedProgress);
     updateProgress(updatedProgress);
+
+    // Update leaderboard
+    const planetProgress = updatedProgress.planetProgress[planetId];
+    const completedLevels = Object.keys(planetProgress.levelProgress).length;
+    const totalPlanetScore = Object.values(planetProgress.levelProgress)
+      .reduce((sum, level) => sum + level.score, 0) / completedLevels;
+    
+    LeaderboardService.updateUserScore(
+      user!.id,
+      user!.name,
+      planetId,
+      updatedProgress.totalPoints,
+      completedLevels,
+      totalPlanetScore
+    );
 
     setGameSession({ ...session, completed: true });
     setShowLevelComplete(true);
@@ -316,11 +362,19 @@ export default function PlanetGame() {
               </h1>
               <p className="text-white/90 text-lg mt-2 drop-shadow-sm">{planet.description}</p>
             </div>
-            <Link href="/galaxy">
-              <button className="bg-white/30 hover:bg-white/40 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors text-white font-semibold border border-white/20 shadow-lg">
-                ← Galaxy
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="bg-yellow-500/80 hover:bg-yellow-600/80 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors text-white font-semibold border border-yellow-400/20 shadow-lg flex items-center gap-2"
+              >
+                🏆 Leaderboard
               </button>
-            </Link>
+              <Link href="/galaxy">
+                <button className="bg-white/30 hover:bg-white/40 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors text-white font-semibold border border-white/20 shadow-lg">
+                  ← Galaxy
+                </button>
+              </Link>
+            </div>
           </div>
 
           {/* Level Grid */}
@@ -396,6 +450,26 @@ export default function PlanetGame() {
               ✅ Question URL copied to clipboard!
             </div>
           )}
+
+          {/* Leaderboard Modal */}
+          {showLeaderboard && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-800">🏆 Leaderboard</h2>
+                  <button
+                    onClick={() => setShowLeaderboard(false)}
+                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="overflow-y-auto max-h-[60vh]">
+                  <Leaderboard planet={planetId} currentUserId={user?.id} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -423,6 +497,7 @@ export default function PlanetGame() {
                 setGameSession(null);
                 setFeedback(null);
                 setUserAnswer('');
+                setUserAnswers([]);
                 router.push(`/games/planet/${planetId}`);
               }}
               className="bg-white/30 hover:bg-white/40 backdrop-blur-sm px-4 py-2 rounded-lg transition-colors text-white font-semibold border border-white/20 shadow-lg"
@@ -486,17 +561,53 @@ export default function PlanetGame() {
 
             {(currentQuestion.type === 'fill-in-blank' || currentQuestion.type === 'correction') && (
               <div className="mt-6">
-                <label className="block text-lg font-medium text-gray-700 mb-3">
-                  {currentQuestion.type === 'fill-in-blank' ? 'Fill in the blank:' : 'Write the corrected sentence:'}
-                </label>
-                <textarea
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder={currentQuestion.type === 'fill-in-blank' ? 'Type your answer...' : 'Type the corrected sentence...'}
-                  className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-lg text-gray-900"
-                  rows={currentQuestion.type === 'correction' ? 3 : 2}
-                  disabled={!!feedback}
-                />
+                {/* Multi-blank questions */}
+                {currentQuestion.blanks && currentQuestion.blanks.count > 1 ? (
+                  <div>
+                    <label className="block text-lg font-medium text-gray-700 mb-3">
+                      Fill in the blanks:
+                    </label>
+                    <div className="space-y-4">
+                      {Array.from({ length: currentQuestion.blanks.count }, (_, index) => (
+                        <div key={index}>
+                          <label className="block text-sm font-medium text-gray-600 mb-2">
+                            Blank {index + 1}:
+                            {currentQuestion.blanks?.labels?.[index] && (
+                              <span className="text-gray-500 ml-1">({currentQuestion.blanks.labels[index]})</span>
+                            )}
+                          </label>
+                          <input
+                            type="text"
+                            value={userAnswers[index] || ''}
+                            onChange={(e) => {
+                              const newAnswers = [...userAnswers];
+                              newAnswers[index] = e.target.value;
+                              setUserAnswers(newAnswers);
+                            }}
+                            placeholder={`Answer for blank ${index + 1}...`}
+                            className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-lg text-gray-900"
+                            disabled={!!feedback}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  /* Single blank questions */
+                  <div>
+                    <label className="block text-lg font-medium text-gray-700 mb-3">
+                      {currentQuestion.type === 'fill-in-blank' ? 'Fill in the blank:' : 'Write the corrected sentence:'}
+                    </label>
+                    <textarea
+                      value={userAnswer}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      placeholder={currentQuestion.type === 'fill-in-blank' ? 'Type your answer...' : 'Type the corrected sentence...'}
+                      className="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none resize-none text-lg text-gray-900"
+                      rows={currentQuestion.type === 'correction' ? 3 : 2}
+                      disabled={!!feedback}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -525,9 +636,15 @@ export default function PlanetGame() {
             {!feedback ? (
               <button
                 onClick={handleSubmit}
-                disabled={!userAnswer}
+                disabled={
+                  currentQuestion?.blanks && currentQuestion.blanks.count > 1
+                    ? userAnswers.length !== currentQuestion.blanks.count || userAnswers.some(answer => !answer.trim())
+                    : !userAnswer
+                }
                 className={`px-10 py-4 rounded-lg text-white font-bold text-lg transition-colors shadow-lg ${
-                  !userAnswer
+                  (currentQuestion?.blanks && currentQuestion.blanks.count > 1
+                    ? userAnswers.length !== currentQuestion.blanks.count || userAnswers.some(answer => !answer.trim())
+                    : !userAnswer)
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-purple-600 hover:bg-purple-700 shadow-purple-200'
                 }`}
@@ -586,6 +703,7 @@ export default function PlanetGame() {
                 setGameSession(null);
                 setFeedback(null);
                 setUserAnswer('');
+                setUserAnswers([]);
                 router.push(`/games/planet/${planetId}`);
               }}
               className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 font-bold shadow-lg"
